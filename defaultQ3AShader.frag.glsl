@@ -42,13 +42,13 @@ void main(void)
 
 #ifdef NUM_LIGHTMAPS
 	color = myhalf4(0.0, 0.0, 0.0, qf_FrontColor.a);
-	color.rgb += myhalf3(Lightmap(u_LightmapTexture0, v_LightmapTexCoord01.st, v_LightmapLayer0123.x)) * u_LightstyleColor[0];
+	color.rgb += myhalf3(Lightmap(u_LightmapTexture0, v_LightmapTexCoord01.st, v_LightmapLayer0123.x)) * LinearColor(u_LightstyleColor[0]);
 #if NUM_LIGHTMAPS >= 2
-	color.rgb += myhalf3(Lightmap(u_LightmapTexture1, v_LightmapTexCoord01.pq, v_LightmapLayer0123.y)) * u_LightstyleColor[1];
+	color.rgb += myhalf3(Lightmap(u_LightmapTexture1, v_LightmapTexCoord01.pq, v_LightmapLayer0123.y)) * LinearColor(u_LightstyleColor[1]);
 #if NUM_LIGHTMAPS >= 3
-	color.rgb += myhalf3(Lightmap(u_LightmapTexture2, v_LightmapTexCoord23.st, v_LightmapLayer0123.z)) * u_LightstyleColor[2];
+	color.rgb += myhalf3(Lightmap(u_LightmapTexture2, v_LightmapTexCoord23.st, v_LightmapLayer0123.z)) * LinearColor(u_LightstyleColor[2]);
 #if NUM_LIGHTMAPS >= 4
-	color.rgb += myhalf3(Lightmap(u_LightmapTexture3, v_LightmapTexCoord23.pq, v_LightmapLayer0123.w)) * u_LightstyleColor[3];
+	color.rgb += myhalf3(Lightmap(u_LightmapTexture3, v_LightmapTexCoord23.pq, v_LightmapLayer0123.w)) * LinearColor(u_LightstyleColor[3]);
 #endif // NUM_LIGHTMAPS >= 4
 #endif // NUM_LIGHTMAPS >= 3
 #endif // NUM_LIGHTMAPS >= 2
@@ -78,7 +78,7 @@ void main(void)
 
 #ifdef APPLY_DRAWFLAT
 	myhalf n = myhalf(step(DRAWFLAT_NORMAL_STEP, abs(v_Normal.z)));
-	diffuse.rgb = myhalf3(mix(u_WallColor, u_FloorColor, n));
+	diffuse.rgb = myhalf3(mix(LinearColor(u_WallColor), LinearColor(u_FloorColor), n));
 #endif
 
 #ifdef APPLY_ALPHA_MASK
@@ -97,7 +97,7 @@ void main(void)
 #endif
 
 #if defined(APPLY_FOG) && !defined(APPLY_FOG_COLOR)
-	color.rgb = mix(color.rgb, u_FogColor, fogDensity);
+	color.rgb = mix(color.rgb, LinearColor(u_FogColor), fogDensity);
 #endif
 
 #if defined(APPLY_SOFT_PARTICLE)

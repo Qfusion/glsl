@@ -3,7 +3,6 @@
 myhalf3 DirectionalLightColor(in myhalf3 surfaceNormalModelspace, out myhalf3 weightedDiffuseNormalModelspace)
 {
 	myhalf3 diffuseNormalModelspace;
-	myhalf diffuseProduct;
 	myhalf3 color = myhalf3(0.0);
 
 #ifdef APPLY_DIRECTIONAL_LIGHT_FROM_NORMAL
@@ -14,24 +13,26 @@ myhalf3 DirectionalLightColor(in myhalf3 surfaceNormalModelspace, out myhalf3 we
 
 	weightedDiffuseNormalModelspace = diffuseNormalModelspace;
 
-#ifdef APPLY_CELSHADING
+#if defined(APPLY_CELSHADING)
 
 	color.rgb += CelShading(surfaceNormalModelspace, diffuseNormalModelspace);
 	
+#elif defined(APPLY_DIRECTIONAL_LIGHT_MIX)
+
+	color.rgb += qf_FrontColor.rgb;
+	
 #else
+
+	myhalf diffuseProduct = myhalf(dot(surfaceNormalModelspace, diffuseNormalModelspace));
 
 #ifdef APPLY_HALFLAMBERT
-	diffuseProduct = float ( clamp(dot (surfaceNormalModelspace, diffuseNormalModelspace), 0.0, 1.0) * 0.5 + 0.5 );
+	diffuseProduct = clamp(diffuseProduct, 0.0, 1.0) * 0.5 + 0.5;
 	diffuseProduct *= diffuseProduct;
-#else
-	diffuseProduct = float (dot (surfaceNormalModelspace, diffuseNormalModelspace));
 #endif // APPLY_HALFLAMBERT
 
-#ifdef APPLY_DIRECTIONAL_LIGHT_MIX
-	color.rgb += qf_FrontColor.rgb;
-#else
-	color.rgb += u_LightDiffuse.rgb * myhalf(max (diffuseProduct, 0.0)) + u_LightAmbient;
-#endif
+	myhalf3 diffuse = LinearColor(u_LightDiffuse.rgb) * myhalf(max (diffuseProduct, 0.0)) + LinearColor(u_LightAmbient.rgb);
+	diffuse *= u_LightingIntensity;
+	color.rgb += diffuse;
 
 #endif // APPLY_CELSHADING
 

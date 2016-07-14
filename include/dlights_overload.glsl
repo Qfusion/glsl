@@ -34,12 +34,13 @@ myhalf3 DynamicLightsColor(in vec3 Position)
 			dot(STR3 * distance.www, surfaceNormalModelspace)), 0.0);
 		#endif
 
-		Color += myhalf3(
-			dot(u_DlightDiffuseAndInvRadius[dlight], falloff),
-			dot(u_DlightDiffuseAndInvRadius[dlight + 1], falloff),
-			dot(u_DlightDiffuseAndInvRadius[dlight + 2], falloff));
+		myhalf4 C0 = myhalf4(LinearColor(u_DlightDiffuseAndInvRadius[dlight].xyz), LinearColor(u_DlightDiffuseAndInvRadius[dlight].w));
+		myhalf4 C1 = myhalf4(LinearColor(u_DlightDiffuseAndInvRadius[dlight + 1].xyz), LinearColor(u_DlightDiffuseAndInvRadius[dlight + 1].w));
+		myhalf4 C2 = myhalf4(LinearColor(u_DlightDiffuseAndInvRadius[dlight + 2].xyz), LinearColor(u_DlightDiffuseAndInvRadius[dlight + 2].w));
+		Color += myhalf3(dot(C0, falloff), dot(C1, falloff), dot(C2, falloff));
 	}
 
+	Color *= u_LightingIntensity;
 	return Color;
 #ifdef dlight
 #undef dlight

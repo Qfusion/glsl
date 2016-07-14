@@ -17,6 +17,7 @@ uniform myhalf3 u_LightstyleColor[NUM_LIGHTMAPS];
 uniform myhalf3 u_LightAmbient;
 uniform myhalf3 u_LightDiffuse;
 uniform vec3 u_LightDir;
+uniform myhalf u_LightingIntensity;
 
 uniform myhalf2 u_BlendMix;
 

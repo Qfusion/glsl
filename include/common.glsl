@@ -1,5 +1,35 @@
 #define DRAWFLAT_NORMAL_STEP	0.5		// floor or ceiling if < abs(normal.z)
 
+myhalf LinearFromsRGB(myhalf c)
+{
+	if (c <= 0.04045)
+		return c * (1.0 / 12.92);
+	return myhalf(pow((c + 0.055)*(1.0/1.055), 2.4));
+}
+
+myhalf3 LinearFromsRGB(myhalf3 v)
+{
+	return myhalf3(LinearFromsRGB(v.r), LinearFromsRGB(v.g), LinearFromsRGB(v.b));
+}
+
+myhalf sRGBFromLinear(myhalf c)
+{
+	if (c < 0.0031308)
+		return c * 12.92;
+	return 1.055 * pow(c, 1.0/2.4) - 0.055;
+}
+
+myhalf3 sRGBFromLinear(myhalf3 v)
+{
+	return myhalf3(sRGBFromLinear(v.r), sRGBFromLinear(v.g), sRGBFromLinear(v.b));
+}
+
+#ifdef APPLY_SRGB_COLORS
+# define LinearColor(c) LinearFromsRGB(c)
+#else
+# define LinearColor(c) (c)
+#endif
+
 #if defined(APPLY_FOG_COLOR)
 #define APPLY_ENV_MODULATE_COLOR
 #else

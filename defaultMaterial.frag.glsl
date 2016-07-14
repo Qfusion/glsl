@@ -54,21 +54,23 @@ void main()
 #endif
 
 	myhalf4 decal = myhalf4 (0.0, 0.0, 0.0, 1.0);
+	myhalf3 lightColor = myhalf3 (0.0);
+	myhalf3 specular = myhalf3 (0.0);
 
 	// get the surface normal
 	surfaceNormal = normalize(myhalf3(qf_texture (u_NormalmapTexture, v_TexCoord)) - myhalf3 (0.5));
 	surfaceNormalModelspace = normalize(v_StrMatrix * surfaceNormal);
 
 #ifdef APPLY_DIRECTIONAL_LIGHT
-	color.rgb += DirectionalLightColor(surfaceNormalModelspace, weightedDiffuseNormalModelspace);
+	lightColor += DirectionalLightColor(surfaceNormalModelspace, weightedDiffuseNormalModelspace);
 #endif
 
 #ifdef NUM_LIGHTMAPS
-	color.rgb += LightmapColor(surfaceNormalModelspace, weightedDiffuseNormalModelspace);
+	lightColor += LightmapColor(surfaceNormalModelspace, weightedDiffuseNormalModelspace);
 #endif
 
 #if defined(NUM_DLIGHTS)
-	color.rgb += DynamicLightsSurfaceColor(v_Position, surfaceNormalModelspace);
+	lightColor += DynamicLightsSurfaceColor(v_Position, surfaceNormalModelspace);
 #endif
 
 #ifdef APPLY_SPECULAR
@@ -80,10 +82,11 @@ void main()
 #endif
 
 	myhalf specularProduct = myhalf(dot (surfaceNormalModelspace, specularNormal));
-	color.rgb += (myhalf3(qf_texture(u_GlossTexture, v_TexCoord)) * u_GlossFactors.x) * pow(myhalf(max(specularProduct, 0.0)), u_GlossFactors.y);
+	specular = myhalf3(qf_texture(u_GlossTexture, v_TexCoord).r * u_GlossFactors.x * pow(myhalf(max(specularProduct, 0.0)), u_GlossFactors.y));
 #endif // APPLY_SPECULAR
 
 #if defined(APPLY_BASETEX_ALPHA_ONLY) && !defined(APPLY_DRAWFLAT)
+	color.rgb = lightColor.rgb + specular.rgb;
 	color = min(color, myhalf4(qf_texture(u_BaseTexture, v_TexCoord).a));
 #else
 	myhalf4 diffuse;
@@ -96,18 +99,19 @@ void main()
 #endif
 
 #ifdef APPLY_ENTITY_DECAL
+	myhalf3 entColor = LinearColor(u_EntityColor.rgb);
 
 #ifdef APPLY_ENTITY_DECAL_ADD
 	decal.rgb = myhalf3(qf_texture(u_EntityDecalTexture, v_TexCoord));
-	diffuse.rgb += u_EntityColor.rgb * decal.rgb;
+	diffuse.rgb += entColor * decal.rgb;
 #else
-	decal = myhalf4(u_EntityColor.rgb, 1.0) * myhalf4(qf_texture(u_EntityDecalTexture, v_TexCoord));
+	decal = myhalf4(entColor, 1.0) * myhalf4(qf_texture(u_EntityDecalTexture, v_TexCoord));
 	diffuse.rgb = mix(diffuse.rgb, decal.rgb, decal.a);
 #endif // APPLY_ENTITY_DECAL_ADD
 
 #endif // APPLY_ENTITY_DECAL
 
-	color = color * diffuse;
+	color = myhalf4(lightColor.rgb * (diffuse.rgb + specular.rgb), diffuse.a);
 #endif // defined(APPLY_BASETEX_ALPHA_ONLY) && !defined(APPLY_DRAWFLAT)
 
 #ifdef APPLY_DECAL
@@ -143,7 +147,7 @@ void main()
 
 #if defined(APPLY_FOG) && !defined(APPLY_FOG_COLOR)
 	myhalf fogDensity = FogDensity(v_TexCoord_FogCoord.pq);
-	color.rgb = mix(color.rgb, u_FogColor, fogDensity);
+	color.rgb = mix(color.rgb, LinearColor(u_FogColor), fogDensity);
 #endif
 
 	qf_FragColor = vec4(color);

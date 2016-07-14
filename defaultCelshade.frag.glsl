@@ -41,11 +41,13 @@ void main(void)
 	QF_ALPHATEST(outColor.a * inColor.a);
 #endif
 
+	myhalf3 entColor = LinearColor(u_EntityColor.rgb);
+
 #ifdef APPLY_ENTITY_DECAL
 #ifdef APPLY_ENTITY_DECAL_ADD
-	outColor.rgb += myhalf3(u_EntityColor.rgb) * myhalf3(qf_texture(u_EntityDecalTexture, v_TexCoord));
+	outColor.rgb += entColor * myhalf3(qf_texture(u_EntityDecalTexture, v_TexCoord));
 #else
-	tempColor = myhalf4(u_EntityColor.rgb, 1.0) * myhalf4(qf_texture(u_EntityDecalTexture, v_TexCoord));
+	tempColor = myhalf4(entColor, 1.0) * myhalf4(qf_texture(u_EntityDecalTexture, v_TexCoord));
 	outColor.rgb = mix(outColor.rgb, tempColor.rgb, tempColor.a);
 #endif
 #endif // APPLY_ENTITY_DECAL
@@ -58,9 +60,9 @@ void main(void)
 
 #ifdef APPLY_STRIPES
 #ifdef APPLY_STRIPES_ADD
-	outColor.rgb += myhalf3(u_EntityColor.rgb) * myhalf3(qf_texture(u_StripesTexture, v_TexCoord));
+	outColor.rgb += entColor * myhalf3(qf_texture(u_StripesTexture, v_TexCoord));
 #else
-	tempColor = myhalf4(u_EntityColor.rgb, 1.0) * myhalf4(qf_texture(u_StripesTexture, v_TexCoord));
+	tempColor = myhalf4(entColor, 1.0) * myhalf4(qf_texture(u_StripesTexture, v_TexCoord));
 	outColor.rgb = mix(outColor.rgb, tempColor.rgb, tempColor.a);
 #endif
 #endif // APPLY_STRIPES_ADD
@@ -91,7 +93,7 @@ void main(void)
 
 #if defined(APPLY_FOG) && !defined(APPLY_FOG_COLOR)
 	myhalf fogDensity = FogDensity(v_FogCoord);
-	outColor.rgb = mix(outColor.rgb, u_FogColor, fogDensity);
+	outColor.rgb = mix(outColor.rgb, LinearColor(u_FogColor), fogDensity);
 #endif
 
 	qf_FragColor = vec4(outColor);
