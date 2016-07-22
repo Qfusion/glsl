@@ -10,15 +10,19 @@ uniform sampler2D u_ColorLUT;
 #endif
 
 #ifdef APPLY_BLOOM
-uniform sampler2D u_BloomTexture;
+uniform sampler2D u_BloomTexture0;
+uniform sampler2D u_BloomTexture1;
+uniform sampler2D u_BloomTexture2;
+uniform sampler2D u_BloomTexture3;
 #endif
+
+const float W = 0.90; // the white point
+const float B = 0.80; // the bright point for bloom
 
 #ifdef APPLY_HDR
 
 uniform myhalf u_HDRGamma;
 uniform myhalf u_HDRExposure;
-
-const float W = 0.90; // the white point
 
 vec3 ACESFilm(vec3 x)
 {
@@ -36,6 +40,17 @@ vec3 ToneMap(vec3 c)
 	return ACESFilm(c / 2.0) / ACESFilm(vec3(W) / 2.0);
 }
 
+#endif
+
+#ifdef APPLY_BLOOM
+vec3 Bloom(vec2 t)
+{
+	vec3 bloom = qf_texture(u_BloomTexture0, t).rgb +
+				 qf_texture(u_BloomTexture1, t).rgb +
+				 qf_texture(u_BloomTexture2, t).rgb +
+				 qf_texture(u_BloomTexture3, t).rgb;
+	return bloom;
+}
 #endif
 
 #ifdef APPLY_LUT
@@ -74,10 +89,10 @@ void main(void)
 
 #endif
 
-#ifdef APPLY_OUT_BLOOM
+#ifdef APPLY_OVEBRIGHT
 
 	qf_FragColor = vec4(coords, 1.0);
-	qf_BrightColor = vec4(coords.rgb - clamp(coords.rgb, 0.0, W), 1.0);
+	qf_BrightColor = vec4(coords.rgb - clamp(coords.rgb, 0.0, B), 1.0);
 	
 #else
 
@@ -89,13 +104,13 @@ void main(void)
 	coords = ColorMap(coords);
 
 #ifdef APPLY_BLOOM
-	coords += ColorMap(qf_texture(u_BloomTexture, v_TexCoord).rgb);
+	coords += ColorMap(Bloom(v_TexCoord));
 #endif // APPLY_BLOOM
 
 #else
 
 #ifdef APPLY_BLOOM
-	coords += qf_texture(u_BloomTexture, v_TexCoord).rgb * vec3(4.0);
+	coords += Bloom(v_TexCoord);
 #endif // APPLY_BLOOM
 
 #endif // APPLY_LUT
