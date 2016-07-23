@@ -10,6 +10,8 @@ uniform float u_OutlineCutOff;
 
 void main(void)
 {
+	vec4 color;
+
 #ifdef APPLY_OUTLINES_CUTOFF
 	if (u_OutlineCutOff > 0.0 && (gl_FragCoord.z / gl_FragCoord.w > u_OutlineCutOff))
 		discard;
@@ -17,8 +19,10 @@ void main(void)
 
 #if defined(APPLY_FOG) && !defined(APPLY_FOG_COLOR)
 	myhalf fogDensity = FogDensity(v_FogCoord);
-	qf_FragColor = vec4(vec3(mix(qf_FrontColor.rgb, LinearColor(u_FogColor), fogDensity)), 1.0);
+	color = vec4(vec3(mix(qf_FrontColor.rgb, LinearColor(u_FogColor), fogDensity)), 1.0);
 #else
-	qf_FragColor = vec4(qf_FrontColor);
+	color = qf_FrontColor;
 #endif
+
+	qf_FragColor = sRGBColor(color);
 }

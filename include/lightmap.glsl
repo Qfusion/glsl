@@ -6,7 +6,7 @@
 #define LightmapAt(t, c, l) qf_texture(t, c)
 #endif
 
-#ifdef APPLY_SRGB_COLORS
+#ifdef APPLY_SRGB2LINEAR
 # define Lightmap(t, c, l) LinearFromsRGB(myhalf3(LightmapAt(t, c, l)))
 #else
 # define Lightmap(t, c, l) myhalf3(LightmapAt(t, c, l))

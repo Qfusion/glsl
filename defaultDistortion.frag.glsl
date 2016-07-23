@@ -79,8 +79,8 @@ void main(void)
 #endif
 
 #ifdef APPLY_GREYSCALE
-	qf_FragColor = vec4(vec3(Greyscale(color)),1.0);
-#else
-	qf_FragColor = vec4(vec3(color),1.0);
+	color = vGreyscale(color));
 #endif
+
+	qf_FragColor = vec4(sRGBColor(color),1.0);
 }

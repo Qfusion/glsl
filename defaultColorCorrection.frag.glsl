@@ -73,13 +73,14 @@ vec3 ColorMap(vec3 c)
 
 void main(void)
 {
-	vec3 coords = qf_texture(u_BaseTexture, v_TexCoord).rgb;
+	vec4 texel = qf_texture(u_BaseTexture, v_TexCoord);
+	vec3 coords = texel.rgb;
 
 #ifdef APPLY_HDR
 	coords = ToneMap(coords * u_HDRExposure);
 #endif
 
-#ifdef APPLY_SRGB_COLORS
+#ifdef APPLY_SRGB2LINEAR
 
 #ifdef APPLY_HDR
 	coords = pow(coords, vec3(1.0 / u_HDRGamma));
@@ -91,8 +92,8 @@ void main(void)
 
 #ifdef APPLY_OVEBRIGHT
 
-	qf_FragColor = vec4(coords, 1.0);
-	qf_BrightColor = vec4(coords.rgb - clamp(coords.rgb, 0.0, B), 1.0);
+	qf_FragColor = vec4(coords, texel.a);
+	qf_BrightColor = vec4(coords - clamp(coords, 0.0, B), texel.a);
 	
 #else
 
@@ -115,6 +116,6 @@ void main(void)
 
 #endif // APPLY_LUT
 
-	qf_FragColor = vec4(coords, 1.0);
+	qf_FragColor = vec4(coords, texel.a);
 #endif // APPLY_OUT_BLOOM
 }

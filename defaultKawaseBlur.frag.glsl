@@ -8,6 +8,7 @@ uniform sampler2D u_BaseTexture;
 
 void main(void)
 {
-	qf_FragColor = vec4(KawaseBlurFilter(u_BaseTexture, v_TexCoord, u_TextureParams.xy, u_TextureParams.z), 1.0);
+	float alpha = qf_texture(u_BaseTexture, v_TexCoord).a;
+	qf_FragColor = vec4(KawaseBlurFilter(u_BaseTexture, v_TexCoord, u_TextureParams.xy, u_TextureParams.z), alpha);
 	//qf_FragColor = qf_texture(u_BaseTexture, v_TexCoord);
 }

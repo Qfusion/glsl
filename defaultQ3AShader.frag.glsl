@@ -109,5 +109,5 @@ void main(void)
 	QF_ALPHATEST(color.a);
 #endif
 
-	qf_FragColor = vec4(color);
+	qf_FragColor = vec4(sRGBColor(color));
 }

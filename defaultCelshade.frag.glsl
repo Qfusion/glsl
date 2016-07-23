@@ -96,5 +96,5 @@ void main(void)
 	outColor.rgb = mix(outColor.rgb, LinearColor(u_FogColor), fogDensity);
 #endif
 
-	qf_FragColor = vec4(outColor);
+	qf_FragColor = vec4(sRGBColor(outColor));
 }

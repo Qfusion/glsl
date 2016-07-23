@@ -8,7 +8,7 @@ myhalf4 VertexRGBGen(in vec4 Position, in vec3 Normal, in myhalf4 VertexColor)
 #endif
 
 #if defined(APPLY_RGB_CONST) && defined(APPLY_ALPHA_CONST)
-	myhalf4 Color = u_ConstColor;
+	myhalf4 Color = LinearColor(u_ConstColor);
 #else
 	myhalf4 Color = myhalf4(1.0);
 

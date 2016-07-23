@@ -12,6 +12,11 @@ myhalf3 LinearFromsRGB(myhalf3 v)
 	return myhalf3(LinearFromsRGB(v.r), LinearFromsRGB(v.g), LinearFromsRGB(v.b));
 }
 
+myhalf4 LinearFromsRGB(myhalf4 v)
+{
+	return myhalf4(LinearFromsRGB(v.r), LinearFromsRGB(v.g), LinearFromsRGB(v.b), v.a);
+}
+
 myhalf sRGBFromLinear(myhalf c)
 {
 	if (c < 0.0031308)
@@ -24,10 +29,21 @@ myhalf3 sRGBFromLinear(myhalf3 v)
 	return myhalf3(sRGBFromLinear(v.r), sRGBFromLinear(v.g), sRGBFromLinear(v.b));
 }
 
-#ifdef APPLY_SRGB_COLORS
+myhalf4 sRGBFromLinear(myhalf4 v)
+{
+	return myhalf4(sRGBFromLinear(v.r), sRGBFromLinear(v.g), sRGBFromLinear(v.b), v.a);
+}
+
+#ifdef APPLY_SRGB2LINEAR
 # define LinearColor(c) LinearFromsRGB(c)
 #else
 # define LinearColor(c) (c)
+#endif
+
+#ifdef APPLY_LINEAR2SRGB
+# define sRGBColor(c) sRGBFromLinear(c)
+#else
+# define sRGBColor(c) (c)
 #endif
 
 #if defined(APPLY_FOG_COLOR)
