@@ -8,12 +8,12 @@ myhalf4 VertexRGBGen(in vec4 Position, in vec3 Normal, in myhalf4 VertexColor)
 #endif
 
 #if defined(APPLY_RGB_CONST) && defined(APPLY_ALPHA_CONST)
-	myhalf4 Color = LinearColor(u_ConstColor);
+	myhalf4 Color = myhalf4(LinearColor(u_ConstColor.rgb) * u_ColorMod, u_ConstColor.a);
 #else
 	myhalf4 Color = myhalf4(1.0);
 
 #if defined(APPLY_RGB_CONST)
-	Color.rgb = LinearColor(u_ConstColor.rgb);
+	Color.rgb = LinearColor(u_ConstColor.rgb) * u_ColorMod;
 #elif defined(APPLY_RGB_VERTEX)
 	Color.rgb = LinearColor(VertexColor.rgb) * u_LightingIntensity;
 #elif defined(APPLY_RGB_ONE_MINUS_VERTEX)
