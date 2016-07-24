@@ -97,7 +97,7 @@ void main(void)
 	
 #else
 
-#if defined(APPLY_LUT) && defined(APPLY_HDR)
+#if defined(APPLY_LUT) && defined(APPLY_SRGB2LINEAR)
 	coords = clamp(coords, 0.0, 1.0);
 #endif
 
