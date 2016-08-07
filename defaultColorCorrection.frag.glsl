@@ -49,7 +49,7 @@ vec3 Bloom(vec2 t)
 				 qf_texture(u_BloomTexture1, t).rgb +
 				 qf_texture(u_BloomTexture2, t).rgb +
 				 qf_texture(u_BloomTexture3, t).rgb;
-	return bloom;
+	return clamp(bloom, 0.0, 1.0);
 }
 #endif
 
