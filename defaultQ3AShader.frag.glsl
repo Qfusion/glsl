@@ -52,6 +52,7 @@ void main(void)
 #endif // NUM_LIGHTMAPS >= 4
 #endif // NUM_LIGHTMAPS >= 3
 #endif // NUM_LIGHTMAPS >= 2
+	color.rgb *= u_LightingIntensity;
 #else
 	color = myhalf4(qf_FrontColor);
 #endif // NUM_LIGHTMAPS
