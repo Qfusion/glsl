@@ -79,7 +79,7 @@ void main(void)
 #endif
 
 #ifdef APPLY_GREYSCALE
-	color = vGreyscale(color));
+	color = Greyscale(color);
 #endif
 
 	qf_FragColor = vec4(sRGBColor(color),1.0);
