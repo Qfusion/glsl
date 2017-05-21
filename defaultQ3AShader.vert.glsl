@@ -53,10 +53,8 @@ void main(void)
 		v_TexCoord = vec2(Position * u_VectorTexMatrix); // account for u_VectorTexMatrix being transposed
 #elif defined(APPLY_TC_GEN_PROJECTION)
 		v_TexCoord = vec2(normalize(u_ModelViewProjectionMatrix * Position) * 0.5 + vec4(0.5));
-#elif defined(APPLY_TC_MOD)
-		v_TexCoord = TextureMatrix2x3Mul(u_TextureMatrix, TexCoord);
 #else
-		v_TexCoord = TexCoord;
+		v_TexCoord = TextureMatrix2x3Mul(u_TextureMatrix, TexCoord);
 #endif // defined(APPLY_TC_GEN)
 
 #endif // !defined(APPLY_CUBEMAP) && !defined(APPLY_SURROUNDMAP)
