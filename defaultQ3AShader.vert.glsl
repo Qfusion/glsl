@@ -63,7 +63,7 @@ void main(void)
 	v_Position = Position.xyz;
 #endif
 
-#if defined(APPLY_CUBEMAP) || defined(APPLY_DRAWFLAT)
+#if defined(APPLY_CUBEMAP) || defined(APPLY_DRAWFLAT) || defined(NUM_DLIGHTS)
 	v_Normal = Normal;
 #endif
 
@@ -82,5 +82,11 @@ void main(void)
 #if defined(APPLY_SOFT_PARTICLE)
 	vec4 modelPos = u_ModelViewMatrix * Position;
 	v_Depth = -modelPos.z;
-#endif	
+#endif
+
+#if defined(NUM_DLIGHTS)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
+	v_LightBits = u_LightBits[int(a_SurfaceIndex)];
+#endif
+#endif
 }

@@ -40,8 +40,9 @@ void main(void)
 {
 	myhalf4 color;
 
-#ifdef NUM_LIGHTMAPS
+#if defined(NUM_LIGHTMAPS) || defined(APPLY_REALTIME_LIGHTS)
 	color = myhalf4(0.0, 0.0, 0.0, qf_FrontColor.a);
+#if defined(NUM_LIGHTMAPS)
 	color.rgb += myhalf3(Lightmap(u_LightmapTexture0, v_LightmapTexCoord01.st, v_LightmapLayer0123.x)) * LinearColor(u_LightstyleColor[0]);
 #if NUM_LIGHTMAPS >= 2
 	color.rgb += myhalf3(Lightmap(u_LightmapTexture1, v_LightmapTexCoord01.pq, v_LightmapLayer0123.y)) * LinearColor(u_LightstyleColor[1]);
@@ -53,17 +54,22 @@ void main(void)
 #endif // NUM_LIGHTMAPS >= 3
 #endif // NUM_LIGHTMAPS >= 2
 	color.rgb *= u_LightingIntensity;
+#endif // NUM_LIGHTMAPS
 #else
 	color = myhalf4(qf_FrontColor);
-#endif // NUM_LIGHTMAPS
+#endif // NUM_LIGHTMAPS || APPLY_REALTIME_LIGHTS
 
 #if defined(APPLY_FOG) && !defined(APPLY_FOG_COLOR)
 	myhalf fogDensity = FogDensity(v_FogCoord);
 #endif
 
 #if defined(NUM_DLIGHTS)
-	color.rgb += DynamicLightsColor(v_Position);
-#endif
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
+	color.rgb += DynamicLightsColor(v_Position, normalize(v_Normal), v_LightBits);
+#else
+	color.rgb += DynamicLightsColor(v_Position, normalize(v_Normal));
+#endif // APPLY_REALTIME_LIGHTS
+#endif // NUM_DLIGHTS
 
 	myhalf4 diffuse;
 

@@ -54,5 +54,11 @@ void main()
 	v_Position = Position.xyz;
 #endif
 
+#if defined(NUM_DLIGHTS)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
+	v_LightBits = u_LightBits[int(a_SurfaceIndex)];
+#endif
+#endif
+
 	gl_Position = u_ModelViewProjectionMatrix * Position;
 }

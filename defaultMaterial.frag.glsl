@@ -47,7 +47,7 @@ void main()
 	myhalf3 surfaceNormalModelspace;
 	myhalf3 weightedDiffuseNormalModelspace;
 
-#if !defined(APPLY_DIRECTIONAL_LIGHT) && !defined(NUM_LIGHTMAPS)
+#if !defined(APPLY_DIRECTIONAL_LIGHT) && !defined(NUM_LIGHTMAPS) && !defined(APPLY_REALTIME_LIGHTS)
 	myhalf4 color = myhalf4 (1.0, 1.0, 1.0, 1.0);
 #else
 	myhalf4 color = myhalf4 (0.0, 0.0, 0.0, 1.0);
@@ -70,8 +70,12 @@ void main()
 #endif
 
 #if defined(NUM_DLIGHTS)
-	lightColor += DynamicLightsSurfaceColor(v_Position, surfaceNormalModelspace);
-#endif
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
+	color.rgb += DynamicLightsColor(v_Position, surfaceNormalModelspace, v_LightBits);
+#else
+	color.rgb += DynamicLightsColor(v_Position, surfaceNormalModelspace);
+#endif // APPLY_REALTIME_LIGHTS
+#endif // NUM_DLIGHTS
 
 #ifdef APPLY_SPECULAR
 

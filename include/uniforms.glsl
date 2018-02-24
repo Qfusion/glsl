@@ -33,3 +33,15 @@ uniform vec2 u_ZRange;
 uniform ivec4 u_Viewport; // x, y, width, height
 
 uniform vec4 u_TextureParams;
+
+#if defined(NUM_DLIGHTS)
+
+uniform vec3 u_DlightPosition[NUM_DLIGHTS];
+uniform myhalf4 u_DlightDiffuseAndInvRadius[NUM_DLIGHTS];
+
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+uniform int u_NumDynamicLights;
+uniform int u_LightBits[MAX_DRAWSURF_SURFS];
+#endif
+
+#endif

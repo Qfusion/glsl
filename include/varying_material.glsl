@@ -18,3 +18,9 @@ qf_varying vec3 v_EyeVector;
 #endif
 
 qf_varying mat3 v_StrMatrix; // directions of S/T/R texcoords (tangent, binormal, normal)
+
+#if defined(NUM_DLIGHTS)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
+qf_flat_varying int v_LightBits;
+#endif
+#endif
