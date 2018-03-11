@@ -51,11 +51,11 @@ void main()
 #endif
 
 #if defined(NUM_DLIGHTS) || defined(APPLY_SPECULAR)
-	v_Position = Position.xyz;
+	v_Position = Position;
 #endif
 
 #if defined(NUM_DLIGHTS)
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
 	v_LightBits = u_LightBits[int(a_SurfaceIndex)];
 #endif
 #endif

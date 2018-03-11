@@ -36,12 +36,21 @@ uniform vec4 u_TextureParams;
 
 #if defined(NUM_DLIGHTS)
 
-uniform vec3 u_DlightPosition[NUM_DLIGHTS];
+uniform mat4 u_DlightMatrix[NUM_DLIGHTS];
 uniform myhalf4 u_DlightDiffuseAndInvRadius[NUM_DLIGHTS];
 
 #if !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
 uniform int u_NumDynamicLights;
-uniform int u_LightBits[MAX_DRAWSURF_SURFS];
 #endif
+
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+uniform int u_LightBits[MAX_DRAWSURF_SURFS];
+#endif // APPLY_LIGHTBITS
+
+#ifdef APPLY_REALTIME_SHADOWS
+uniform vec4 u_DlightShadowmapParams[NUM_DLIGHTS];
+uniform vec4 u_DlightShadowmapTextureScale[NUM_DLIGHTS];
+#endif // APPLY_REALTIME_SHADOWS
+
 
 #endif

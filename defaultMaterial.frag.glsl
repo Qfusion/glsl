@@ -47,10 +47,10 @@ void main()
 	myhalf3 surfaceNormalModelspace;
 	myhalf3 weightedDiffuseNormalModelspace;
 
-#if !defined(APPLY_DIRECTIONAL_LIGHT) && !defined(NUM_LIGHTMAPS) && !defined(APPLY_REALTIME_LIGHTS)
-	myhalf4 color = myhalf4 (1.0, 1.0, 1.0, 1.0);
-#else
+#if defined(APPLY_DIRECTIONAL_LIGHT) || defined(NUM_LIGHTMAPS) || defined(APPLY_REALTIME_SHADOWS)
 	myhalf4 color = myhalf4 (0.0, 0.0, 0.0, 1.0);
+#else
+	myhalf4 color = myhalf4 (1.0, 1.0, 1.0, 1.0);
 #endif
 
 	myhalf4 decal = myhalf4 (0.0, 0.0, 0.0, 1.0);
@@ -70,19 +70,19 @@ void main()
 #endif
 
 #if defined(NUM_DLIGHTS)
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
-	color.rgb += DynamicLightsColor(v_Position, surfaceNormalModelspace, v_LightBits);
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+	lightColor += DynamicLightsColor(v_Position, surfaceNormalModelspace, v_LightBits);
 #else
-	color.rgb += DynamicLightsColor(v_Position, surfaceNormalModelspace);
+	lightColor += DynamicLightsColor(v_Position, surfaceNormalModelspace);
 #endif // APPLY_REALTIME_LIGHTS
 #endif // NUM_DLIGHTS
 
 #ifdef APPLY_SPECULAR
 
 #ifdef NORMALIZE_DIFFUSE_NORMAL
-	myhalf3 specularNormal = normalize (myhalf3 (normalize (weightedDiffuseNormalModelspace)) + myhalf3 (normalize (u_EntityDist - v_Position)));
+	myhalf3 specularNormal = normalize (myhalf3 (normalize (weightedDiffuseNormalModelspace)) + myhalf3 (normalize (u_EntityDist - v_Position.xyz)));
 #else
-	myhalf3 specularNormal = normalize (weightedDiffuseNormalModelspace + myhalf3 (normalize (u_EntityDist - v_Position)));
+	myhalf3 specularNormal = normalize (weightedDiffuseNormalModelspace + myhalf3 (normalize (u_EntityDist - v_Position.xyz)));
 #endif
 
 	myhalf specularProduct = myhalf(dot (surfaceNormalModelspace, specularNormal));

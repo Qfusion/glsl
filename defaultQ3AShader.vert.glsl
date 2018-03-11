@@ -60,7 +60,7 @@ void main(void)
 #endif // !defined(APPLY_CUBEMAP) && !defined(APPLY_SURROUNDMAP)
 
 #if defined(NUM_DLIGHTS) || defined(APPLY_CUBEMAP) || defined(APPLY_SURROUNDMAP)
-	v_Position = Position.xyz;
+	v_Position = Position;
 #endif
 
 #if defined(APPLY_CUBEMAP) || defined(APPLY_DRAWFLAT) || defined(NUM_DLIGHTS)
@@ -85,7 +85,7 @@ void main(void)
 #endif
 
 #if defined(NUM_DLIGHTS)
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
 	v_LightBits = u_LightBits[int(a_SurfaceIndex)];
 #endif
 #endif

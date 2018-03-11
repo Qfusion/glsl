@@ -7,7 +7,7 @@
 #endif
 
 #if defined(NUM_DLIGHTS) || defined(APPLY_CUBEMAP) || defined(APPLY_SURROUNDMAP)
-qf_varying vec3 v_Position;
+qf_varying vec4 v_Position;
 #endif
 
 #if defined(APPLY_CUBEMAP) || defined(APPLY_DRAWFLAT) || defined(NUM_DLIGHTS)
@@ -39,7 +39,7 @@ qf_varying float v_Depth;
 #endif
 
 #if defined(NUM_DLIGHTS)
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
 flat qf_varying int v_LightBits;
 #endif
 #endif

@@ -10,7 +10,7 @@ qf_flat_varying vec4 v_LightmapLayer0123;
 #endif
 
 #if defined(NUM_DLIGHTS) || defined(APPLY_SPECULAR)
-qf_varying vec3 v_Position;
+qf_varying vec4 v_Position;
 #endif
 
 #if defined(APPLY_SPECULAR) || defined(APPLY_OFFSETMAPPING) || defined(APPLY_RELIEFMAPPING)
@@ -20,7 +20,7 @@ qf_varying vec3 v_EyeVector;
 qf_varying mat3 v_StrMatrix; // directions of S/T/R texcoords (tangent, binormal, normal)
 
 #if defined(NUM_DLIGHTS)
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
 qf_flat_varying int v_LightBits;
 #endif
 #endif

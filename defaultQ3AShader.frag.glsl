@@ -40,7 +40,7 @@ void main(void)
 {
 	myhalf4 color;
 
-#if defined(NUM_LIGHTMAPS) || defined(APPLY_REALTIME_LIGHTS)
+#if defined(NUM_LIGHTMAPS) || defined(APPLY_REALTIME_SHADOWS)
 	color = myhalf4(0.0, 0.0, 0.0, qf_FrontColor.a);
 #if defined(NUM_LIGHTMAPS)
 	color.rgb += myhalf3(Lightmap(u_LightmapTexture0, v_LightmapTexCoord01.st, v_LightmapLayer0123.x)) * LinearColor(u_LightstyleColor[0]);
@@ -57,28 +57,28 @@ void main(void)
 #endif // NUM_LIGHTMAPS
 #else
 	color = myhalf4(qf_FrontColor);
-#endif // NUM_LIGHTMAPS || APPLY_REALTIME_LIGHTS
+#endif // NUM_LIGHTMAPS || APPLY_REALTIME_SHADOWS
 
 #if defined(APPLY_FOG) && !defined(APPLY_FOG_COLOR)
 	myhalf fogDensity = FogDensity(v_FogCoord);
 #endif
 
 #if defined(NUM_DLIGHTS)
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(APPLY_REALTIME_LIGHTS)
-	color.rgb += DynamicLightsColor(v_Position, normalize(v_Normal), v_LightBits);
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+	color.rgb += DynamicLightsColor(v_Position, myhalf3(normalize(v_Normal)), v_LightBits);
 #else
-	color.rgb += DynamicLightsColor(v_Position, normalize(v_Normal));
+	color.rgb += DynamicLightsColor(v_Position, myhalf3(normalize(v_Normal)));
 #endif // APPLY_REALTIME_LIGHTS
 #endif // NUM_DLIGHTS
 
 	myhalf4 diffuse;
 
 #if defined(APPLY_CUBEMAP)
-	diffuse = myhalf4(qf_textureCube(u_BaseTexture, reflect(v_Position - u_EntityDist, normalize(v_Normal))));
+	diffuse = myhalf4(qf_textureCube(u_BaseTexture, reflect(v_Position.xyz - u_EntityDist, normalize(v_Normal))));
 #elif defined(APPLY_CUBEMAP_VERTEX)
 	diffuse = myhalf4(qf_textureCube(u_BaseTexture, v_TexCoord));
 #elif defined(APPLY_SURROUNDMAP)
-	diffuse = myhalf4(qf_textureCube(u_BaseTexture, v_Position - u_EntityDist));
+	diffuse = myhalf4(qf_textureCube(u_BaseTexture, v_Position.xyz - u_EntityDist));
 #else
 	diffuse = myhalf4(qf_texture(u_BaseTexture, v_TexCoord));
 #endif
