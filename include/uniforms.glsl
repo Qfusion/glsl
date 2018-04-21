@@ -39,11 +39,11 @@ uniform vec4 u_TextureParams;
 uniform mat4 u_DlightMatrix[NUM_DLIGHTS];
 uniform myhalf4 u_DlightDiffuseAndInvRadius[NUM_DLIGHTS];
 
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
 uniform int u_NumDynamicLights;
 #endif
 
-#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
 uniform int u_LightBits[MAX_DRAWSURF_SURFS];
 #endif // APPLY_LIGHTBITS
 

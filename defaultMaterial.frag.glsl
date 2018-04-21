@@ -70,7 +70,7 @@ void main()
 #endif
 
 #if defined(NUM_DLIGHTS)
-#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
 	lightColor += DynamicLightsColor(v_Position, surfaceNormalModelspace, v_LightBits);
 #else
 	lightColor += DynamicLightsColor(v_Position, surfaceNormalModelspace);

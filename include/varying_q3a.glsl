@@ -39,7 +39,7 @@ qf_varying float v_Depth;
 #endif
 
 #if defined(NUM_DLIGHTS)
-#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
 flat qf_varying int v_LightBits;
 #endif
 #endif

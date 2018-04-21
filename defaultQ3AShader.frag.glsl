@@ -64,7 +64,7 @@ void main(void)
 #endif
 
 #if defined(NUM_DLIGHTS)
-#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
 	color.rgb += DynamicLightsColor(v_Position, myhalf3(normalize(v_Normal)), v_LightBits);
 #else
 	color.rgb += DynamicLightsColor(v_Position, myhalf3(normalize(v_Normal)));

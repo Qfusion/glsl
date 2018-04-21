@@ -6,12 +6,12 @@ myhalf3 DynamicLightsColor(in vec4 Position, in myhalf3 surfaceNormalModelspace)
 {
 	myhalf3 Color = myhalf3(0.0);
 	
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(DLIGHTS_LIGHTBITS_IN)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 130) && defined(DLIGHTS_LIGHTBITS_IN)
 	int mask = 15;
 #endif
 
 #if NUM_DLIGHTS > 4 // prevent the compiler from possibly handling the NUM_DLIGHTS <= 4 case as a real loop
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
 	for (int dlight = 0; dlight < u_NumDynamicLights; dlight += 4)
 #else
 	for (int dlight = 0; dlight < NUM_DLIGHTS; dlight += 4)
@@ -20,7 +20,7 @@ myhalf3 DynamicLightsColor(in vec4 Position, in myhalf3 surfaceNormalModelspace)
 #define dlight 0
 #endif
 	{
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(DLIGHTS_LIGHTBITS_IN)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 130) && defined(DLIGHTS_LIGHTBITS_IN)
 		if ((lightBits & mask) == 0) {
 #if NUM_DLIGHTS > 4
 			mask = mask << 4;
@@ -49,18 +49,18 @@ myhalf3 DynamicLightsColor(in vec4 Position, in myhalf3 surfaceNormalModelspace)
 
 		falloff *= falloff;
 
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
 
 #if defined(APPLY_REALTIME_SHADOWS)
 		for (int s = 0; s < 4; s++) {
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(DLIGHTS_LIGHTBITS_IN)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 130) && defined(DLIGHTS_LIGHTBITS_IN)
 			if (lightBits >= (1 << (dlight+s)) && ((lightBits & (1 << (dlight+s))) != 0)) {
 #endif
 				if (u_DlightShadowmapParams[dlight+s].z > 0) {
 					vec3 shadowmaptc = GetShadowMapTC2D(STR[s], u_DlightShadowmapParams[dlight+s]) + vec3(u_DlightShadowmapTextureScale[dlight+s].zw, 0.0f);
 					bits[s] *= ShadowmapFilter(u_ShadowmapTexture, shadowmaptc, u_DlightShadowmapTextureScale[dlight+s].xy);
 				}
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(DLIGHTS_LIGHTBITS_IN)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 130) && defined(DLIGHTS_LIGHTBITS_IN)
 			}
 #endif
 		}
@@ -82,7 +82,7 @@ myhalf3 DynamicLightsColor(in vec4 Position, in myhalf3 surfaceNormalModelspace)
 		myhalf4 C2 = myhalf4(u_DlightDiffuseAndInvRadius[dlight + 2]);
 		Color += myhalf3(dot(C0, falloff), dot(C1, falloff), dot(C2, falloff));
 		
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330) && defined(DLIGHTS_LIGHTBITS_IN)
+#if !defined(GL_ES) && (QF_GLSL_VERSION >= 130) && defined(DLIGHTS_LIGHTBITS_IN)
 		mask = mask << 4;
 #endif
 	}
