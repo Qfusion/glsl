@@ -87,7 +87,6 @@ myhalf3 DynamicLightsColor(in vec4 Position, in myhalf3 surfaceNormalModelspace)
 #endif
 	}
 
-	Color *= u_LightingIntensity;
 	return Color;
 #ifdef dlight
 #undef dlight

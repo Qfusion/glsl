@@ -47,26 +47,28 @@ void main()
 	myhalf3 surfaceNormalModelspace;
 	myhalf3 weightedDiffuseNormalModelspace;
 
-#if defined(APPLY_DIRECTIONAL_LIGHT) || defined(NUM_LIGHTMAPS) || defined(APPLY_REALTIME_SHADOWS)
-	myhalf4 color = myhalf4 (0.0, 0.0, 0.0, 1.0);
-#else
 	myhalf4 color = myhalf4 (1.0, 1.0, 1.0, 1.0);
-#endif
 
 	myhalf4 decal = myhalf4 (0.0, 0.0, 0.0, 1.0);
-	myhalf3 lightColor = myhalf3 (0.0);
 	myhalf3 specular = myhalf3 (0.0);
 
 	// get the surface normal
 	surfaceNormal = normalize(myhalf3(qf_texture (u_NormalmapTexture, v_TexCoord)) - myhalf3 (0.5));
 	surfaceNormalModelspace = normalize(v_StrMatrix * surfaceNormal);
 
+	myhalf3 lightColor = myhalf3 (0.0);
+
+#if defined(APPLY_DIRECTIONAL_LIGHT) || defined(NUM_LIGHTMAPS) || defined(APPLY_VERTEX_LIGHTING) || defined(NUM_DLIGHTS)
+#ifdef APPLY_VERTEX_LIGHTING
+	lightColor += qf_FrontColor.rgb * LinearColor(u_LightstyleColor[0]); // qf_FrontColor is already linear
+#endif
+
 #ifdef APPLY_DIRECTIONAL_LIGHT
 	lightColor += DirectionalLightColor(surfaceNormalModelspace, weightedDiffuseNormalModelspace);
 #endif
 
 #ifdef NUM_LIGHTMAPS
-	lightColor += LightmapColor(surfaceNormalModelspace, weightedDiffuseNormalModelspace);
+	lightColor += DeluxemapColor(surfaceNormalModelspace, weightedDiffuseNormalModelspace);
 #endif
 
 #if defined(NUM_DLIGHTS)
@@ -76,6 +78,9 @@ void main()
 	lightColor += DynamicLightsColor(v_Position, surfaceNormalModelspace);
 #endif // APPLY_REALTIME_LIGHTS
 #endif // NUM_DLIGHTS
+
+	lightColor *= u_LightingIntensity;
+#endif // APPLY_DIRECTIONAL_LIGHT || NUM_LIGHTMAPS || APPLY_VERTEX_LIGHTING
 
 #ifdef APPLY_SPECULAR
 
@@ -129,15 +134,13 @@ void main()
 #endif // APPLY_DECAL_ADD
 	color.a *= myhalf(qf_FrontColor.a);
 
-#else
+#else // APPLY_DECAL
 
-#if !defined (APPLY_DIRECTIONAL_LIGHT) || !defined(APPLY_DIRECTIONAL_LIGHT_MIX)
 # if defined(APPLY_ENV_MODULATE_COLOR)
 	color *= myhalf4(qf_FrontColor);
-# endif
-#else
+# else
 	color.a *= myhalf(qf_FrontColor.a);
-#endif
+# endif
 
 #endif // APPLY_DECAL
 

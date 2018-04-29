@@ -10,8 +10,10 @@ uniform vec3 u_EntityDist;
 uniform vec3 u_EntityOrigin;
 uniform myhalf4 u_EntityColor;
 
-#ifdef NUM_LIGHTMAPS
+#if defined(NUM_LIGHTMAPS)
 uniform myhalf3 u_LightstyleColor[NUM_LIGHTMAPS];
+#elif defined(APPLY_VERTEX_LIGHTING)
+uniform myhalf3 u_LightstyleColor[1];
 #endif
 
 uniform myhalf3 u_LightAmbient;
