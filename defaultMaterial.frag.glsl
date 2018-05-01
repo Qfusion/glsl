@@ -58,7 +58,7 @@ void main()
 
 	myhalf3 lightColor = myhalf3 (0.0);
 
-#if defined(APPLY_DIRECTIONAL_LIGHT) || defined(NUM_LIGHTMAPS) || defined(APPLY_VERTEX_LIGHTING) || defined(NUM_DLIGHTS)
+#if defined(APPLY_LIGHTING)
 #ifdef APPLY_VERTEX_LIGHTING
 	lightColor += qf_FrontColor.rgb * LinearColor(u_LightstyleColor[0]); // qf_FrontColor is already linear
 #endif

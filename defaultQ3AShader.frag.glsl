@@ -61,7 +61,7 @@ void main(void)
 	myhalf4 color;
 	myhalf3 lightColor = myhalf3(qf_FrontColor.rgb);
 
-#if defined(APPLY_VERTEX_LIGHTING) || defined(NUM_LIGHTMAPS) || defined(NUM_DLIGHTS)
+#if defined(APPLY_LIGHTING)
 #ifdef APPLY_VERTEX_LIGHTING
 	lightColor *= LinearColor(u_LightstyleColor[0]); // qf_FrontColor is already linear
 #elif defined(NUM_LIGHTMAPS)
