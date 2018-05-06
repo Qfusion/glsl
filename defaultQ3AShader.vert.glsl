@@ -83,10 +83,4 @@ void main(void)
 	vec4 modelPos = u_ModelViewMatrix * Position;
 	v_Depth = -modelPos.z;
 #endif
-
-#if defined(NUM_DLIGHTS)
-#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
-	v_LightBits = u_LightBits[int(a_SurfaceIndex)];
-#endif
-#endif
 }

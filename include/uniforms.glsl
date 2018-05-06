@@ -38,20 +38,20 @@ uniform vec4 u_TextureParams;
 
 #if defined(NUM_DLIGHTS)
 
-uniform mat4 u_DlightMatrix[NUM_DLIGHTS];
-uniform myhalf4 u_DlightDiffuseAndInvRadius[NUM_DLIGHTS];
+#if defined(APPLY_REALTIME_SHADOWS) || defined(APPLY_DLIGHT_CUBEFILTER)
+uniform mat4 u_DlightMatrix;
+#endif
+uniform vec3 u_DlightVector;
 
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
-uniform int u_NumDynamicLights;
+uniform myhalf4 u_DlightDiffuseAndInvRadius;
+
+#ifdef APPLY_DLIGHT_CUBEFILTER
+uniform samplerCube u_CubeFilter;
 #endif
 
-#if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
-uniform int u_LightBits[MAX_DRAWSURF_SURFS];
-#endif // APPLY_LIGHTBITS
-
 #ifdef APPLY_REALTIME_SHADOWS
-uniform vec4 u_DlightShadowmapParams[NUM_DLIGHTS];
-uniform vec4 u_DlightShadowmapTextureScale[NUM_DLIGHTS];
+uniform vec4 u_DlightShadowmapParams;
+uniform vec4 u_DlightShadowmapTextureScale;
 #endif // APPLY_REALTIME_SHADOWS
 
 

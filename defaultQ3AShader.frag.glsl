@@ -72,11 +72,7 @@ void main(void)
 #endif
 
 #if defined(NUM_DLIGHTS)
-# if defined(APPLY_LIGHTBITS) && !defined(GL_ES) && (QF_GLSL_VERSION >= 130)
-	lightColor += DynamicLightsColor(v_Position, myhalf3(normalize(v_Normal)), v_LightBits);
-# else
 	lightColor += DynamicLightsColor(v_Position, myhalf3(normalize(v_Normal)));
-# endif // APPLY_REALTIME_LIGHTS
 #endif // NUM_DLIGHTS
 
 	lightColor *= u_LightingIntensity;
