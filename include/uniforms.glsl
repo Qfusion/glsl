@@ -52,6 +52,12 @@ uniform samplerCube u_CubeFilter;
 #ifdef APPLY_REALTIME_SHADOWS
 uniform vec4 u_DlightShadowmapParams;
 uniform vec4 u_DlightShadowmapTextureScale;
+
+#ifdef APPLY_DLIGHT_DIRECTIONAL
+uniform int u_DlightShadowmapNumCascades;
+uniform mat4 u_DlightShadowmapCascadeMatrix[MAX_SHADOW_CASCADES];
+#endif
+
 #endif // APPLY_REALTIME_SHADOWS
 
 
