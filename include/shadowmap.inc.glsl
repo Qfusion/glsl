@@ -4,18 +4,14 @@
 // shadowmapping enhancements by Lee 'eihrul' Salzman\n
 
 #ifdef APPLY_SHADOW_SAMPLERS
-# define SHADOW_SAMPLER sampler2DShadow
 # define dshadow2D(t,v) float(qf_shadow(t,v))
 #else
-# define SHADOW_SAMPLER sampler2D
 # ifdef APPLY_RGB_SHADOW_24BIT
 #  define dshadow2D(t,v) step(v.z, decodedepthmacro24(qf_texture(t, v.xy)))
 # else
 #  define dshadow2D(t,v) step(v.z, decodedepthmacro16(qf_texture(t, v.xy)))
 # endif
 #endif
-
-uniform SHADOW_SAMPLER u_ShadowmapTexture;
 
 // the following function comes from darkplaces source code
 // authored by Forest 'LordHavoc' Hale along with Lee 'eihrul' Salzman
@@ -113,3 +109,82 @@ myhalf ShadowmapFilter(in SHADOW_SAMPLER shadowmapTex, in vec3 shadowmaptc, in v
 
 	return f;
 }
+
+float ShadowmapCascadedBlendFrac(in vec3 tc) 
+{
+	if (u_ShadowmapCascadesBlendArea < 0.01) {
+		return 1.0;
+	}
+	return min(min(1.0f - tc.x, 1.0f - tc.y), min(tc.x, tc.y)) / u_ShadowmapCascadesBlendArea;
+}
+
+#define shadowtex(tex) ShadowmapFilter(shadowmapTex, tex + vec3(texscale.zw, 0.0f), texscale.xy)
+
+myhalf ShadowmapOrthoFilter(in SHADOW_SAMPLER shadowmapTex, in mat4 shadowMatrix, in vec4 pos, in vec4 texscale, in vec4 params) 
+{
+	myhalf f;
+	vec2 pad = params.xy;
+	vec3 shadowmaptc = vec3(shadowMatrix * pos);
+
+	if (min(shadowmaptc.x, shadowmaptc.y) < pad.x || max(shadowmaptc.x, shadowmaptc.y) > pad.y) {
+		discard;
+	}
+	if (shadowmaptc.z < 0.0 || shadowmaptc.z > 1.0) {
+		discard;
+	}
+
+	f = shadowtex(shadowmaptc);
+
+	return f;
+}
+
+myhalf ShadowmapOrthoFilterCSM(in SHADOW_SAMPLER shadowmapTex, int numCascades, in mat4 cascadeMatrix[MAX_SHADOW_CASCADES], in vec4 pos, in out myhalf3 Color, in vec4 texscale, in vec4 params) 
+{
+	myhalf f;
+	myhalf3 cascadeColors[MAX_SHADOW_CASCADES] = {
+		myhalf3(1.5f, 0.0f, 0.0f),
+		myhalf3(0.0f, 1.5f, 0.0f),
+		myhalf3(0.0f, 0.0f, 5.5f),
+		myhalf3(1.5f, 0.0f, 5.5f)
+	};
+	int cascadeIndex = -1;
+	vec2 pad = params.xy;
+	vec3 shadowmaptc = vec3(-1.0);
+
+	numCascades = min(numCascades, MAX_SHADOW_CASCADES);
+	for (int i = 0; i < numCascades && cascadeIndex < 0; i++) {
+		shadowmaptc = vec3(cascadeMatrix[i] * pos);
+		if (shadowmaptc.z > 0.0 && shadowmaptc.z < 1.0) {
+			if (min(shadowmaptc.x, shadowmaptc.y) > pad.x && max(shadowmaptc.x, shadowmaptc.y) < pad.y) {
+				cascadeIndex = i;
+				Color = mix(Color, cascadeColors[i], params.w);
+			}
+		}
+	}
+
+	if (cascadeIndex < 0 || shadowmaptc.z < 0.0 || shadowmaptc.z > 1.0) {
+		discard;
+	}
+
+	float frac = ShadowmapCascadedBlendFrac(shadowmaptc / params.z);
+	if (cascadeIndex < numCascades - 1 && frac < 1.0f) {
+		vec3 shadowmaptc2 = vec3(cascadeMatrix[cascadeIndex+1] * pos);
+
+		shadowmaptc.x += float(cascadeIndex) * params.z;
+		shadowmaptc2.x += float(cascadeIndex+1) * params.z;
+
+		myhalf shadow1 = shadowtex(shadowmaptc);
+		myhalf shadow2 = shadowtex(shadowmaptc2);
+
+		frac = 1.0f - frac;
+		f = mix(shadow1, shadow2, frac);
+		Color = mix(Color, cascadeColors[cascadeIndex+1], frac * params.w);
+	} else {
+		shadowmaptc.x += float(cascadeIndex) * params.z;
+		f = shadowtex(shadowmaptc);
+	}
+
+	return f;
+}
+
+#undef shadowtex

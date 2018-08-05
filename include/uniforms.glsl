@@ -1,3 +1,9 @@
+#ifdef APPLY_SHADOW_SAMPLERS
+# define SHADOW_SAMPLER sampler2DShadow
+#else
+# define SHADOW_SAMPLER sampler2D
+#endif
+
 uniform mat4 u_ModelViewMatrix;
 uniform mat4 u_ModelViewProjectionMatrix;
 
@@ -50,12 +56,15 @@ uniform samplerCube u_CubeFilter;
 #endif
 
 #ifdef APPLY_REALTIME_SHADOWS
-uniform vec4 u_DlightShadowmapParams;
-uniform vec4 u_DlightShadowmapTextureScale;
+uniform SHADOW_SAMPLER u_ShadowmapTexture;
+
+uniform vec4 u_ShadowmapParams;
+uniform vec4 u_ShadowmapTextureScale;
 
 #ifdef APPLY_DLIGHT_DIRECTIONAL
-uniform int u_DlightShadowmapNumCascades;
-uniform mat4 u_DlightShadowmapCascadeMatrix[MAX_SHADOW_CASCADES];
+uniform int u_ShadowmapNumCascades;
+uniform mat4 u_ShadowmapCascadeMatrix[MAX_SHADOW_CASCADES];
+uniform float u_ShadowmapCascadesBlendArea;
 #endif
 
 #endif // APPLY_REALTIME_SHADOWS
