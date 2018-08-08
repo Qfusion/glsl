@@ -141,12 +141,12 @@ myhalf ShadowmapOrthoFilter(in SHADOW_SAMPLER shadowmapTex, in mat4 shadowMatrix
 myhalf ShadowmapOrthoFilterCSM(in SHADOW_SAMPLER shadowmapTex, int numCascades, in mat4 cascadeMatrix[MAX_SHADOW_CASCADES], in vec4 pos, in out myhalf3 Color, in vec4 texscale, in vec4 params) 
 {
 	myhalf f;
-	myhalf3 cascadeColors[MAX_SHADOW_CASCADES] = {
+	myhalf3 cascadeColors[MAX_SHADOW_CASCADES] = myhalf3[](
 		myhalf3(1.5f, 0.0f, 0.0f),
 		myhalf3(0.0f, 1.5f, 0.0f),
 		myhalf3(0.0f, 0.0f, 5.5f),
 		myhalf3(1.5f, 0.0f, 5.5f)
-	};
+	);
 	int cascadeIndex = -1;
 	vec2 pad = params.xy;
 	vec3 shadowmaptc = vec3(-1.0);

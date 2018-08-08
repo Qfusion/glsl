@@ -61,11 +61,9 @@ uniform SHADOW_SAMPLER u_ShadowmapTexture;
 uniform vec4 u_ShadowmapParams;
 uniform vec4 u_ShadowmapTextureScale;
 
-#ifdef APPLY_DLIGHT_DIRECTIONAL
 uniform int u_ShadowmapNumCascades;
 uniform mat4 u_ShadowmapCascadeMatrix[MAX_SHADOW_CASCADES];
 uniform float u_ShadowmapCascadesBlendArea;
-#endif
 
 #endif // APPLY_REALTIME_SHADOWS
 
