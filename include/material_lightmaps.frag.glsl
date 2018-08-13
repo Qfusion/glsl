@@ -11,7 +11,7 @@ uniform LightmapSampler u_LightmapTexture3;
 #endif // NUM_LIGHTMAPS >= 2
 
 // deluxemapping using light vectors in modelspace
-myhalf3 LightmapColor(in myhalf3 surfaceNormalModelspace, out myhalf3 weightedDiffuseNormalModelspace)
+myhalf3 DeluxemapColor(in myhalf3 surfaceNormalModelspace, out myhalf3 weightedDiffuseNormalModelspace)
 {
 	myhalf3 diffuseNormalModelspace;
 	myhalf diffuseProduct;
@@ -57,6 +57,5 @@ myhalf3 LightmapColor(in myhalf3 surfaceNormalModelspace, out myhalf3 weightedDi
 #endif // NUM_LIGHTMAPS >= 3
 #endif // NUM_LIGHTMAPS >= 2
 
-	color.rgb *= u_LightingIntensity;
 	return color;
 }

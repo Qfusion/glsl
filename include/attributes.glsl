@@ -5,6 +5,7 @@ qf_attribute vec4 a_SVector;
 qf_attribute vec4 a_Normal;
 qf_attribute vec4 a_Color;
 qf_attribute vec2 a_TexCoord;
+
 # ifdef NUM_LIGHTMAPS
 qf_attribute qf_lmvec01 a_LightmapCoord01;
 # if NUM_LIGHTMAPS > 2
@@ -14,5 +15,7 @@ qf_attribute qf_lmvec23 a_LightmapCoord23;
 qf_attribute vec4 a_LightmapLayer0123;
 # endif // LIGHTMAP_ARRAYS
 #endif // NUM_LIGHTMAPS
+
+qf_attribute float a_SurfaceIndex;
 
 #endif // VERTEX_SHADER

@@ -51,7 +51,7 @@ void main()
 #endif
 
 #if defined(NUM_DLIGHTS) || defined(APPLY_SPECULAR)
-	v_Position = Position.xyz;
+	v_Position = Position;
 #endif
 
 	gl_Position = u_ModelViewProjectionMatrix * Position;

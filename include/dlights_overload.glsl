@@ -1,48 +1,61 @@
-#ifdef DLIGHTS_SURFACE_NORMAL_IN
-myhalf3 DynamicLightsSurfaceColor(in vec3 Position, in myhalf3 surfaceNormalModelspace)
-#else
-myhalf3 DynamicLightsColor(in vec3 Position)
-#endif
+myhalf3 DynamicLightsColor(in vec4 Position, in myhalf3 surfaceNormalModelspace)
 {
-	myhalf3 Color = myhalf3(0.0);
+	myhalf3 dir;
+	myhalf3 Color = myhalf3(u_DlightDiffuseAndInvRadius.xyz);
+	vec3 cubeVec;
 
-#if NUM_DLIGHTS > 4 // prevent the compiler from possibly handling the NUM_DLIGHTS <= 4 case as a real loop
-#if !defined(GL_ES) && (QF_GLSL_VERSION >= 330)
-	for (int dlight = 0; dlight < u_NumDynamicLights; dlight += 4)
+#if defined(APPLY_DLIGHT_DIRECTIONAL)
+	dir = myhalf3(u_DlightVector);
 #else
-	for (int dlight = 0; dlight < NUM_DLIGHTS; dlight += 4)
+	dir = myhalf3(u_DlightVector - Position.xyz);
 #endif
-#else
-#define dlight 0
-#endif
-	{
-		myhalf3 STR0 = myhalf3(u_DlightPosition[dlight] - Position);
-		myhalf3 STR1 = myhalf3(u_DlightPosition[dlight + 1] - Position);
-		myhalf3 STR2 = myhalf3(u_DlightPosition[dlight + 2] - Position);
-		myhalf3 STR3 = myhalf3(u_DlightPosition[dlight + 3] - Position);
-		myhalf4 distance = myhalf4(length(STR0), length(STR1), length(STR2), length(STR3));
-		myhalf4 falloff = clamp(myhalf4(1.0) - distance * u_DlightDiffuseAndInvRadius[dlight + 3], 0.0, 1.0);
 
-		falloff *= falloff;
-
-		#ifdef DLIGHTS_SURFACE_NORMAL_IN
-		distance = myhalf4(1.0) / distance;
-		falloff *= max(myhalf4(
-			dot(STR0 * distance.xxx, surfaceNormalModelspace),
-			dot(STR1 * distance.yyy, surfaceNormalModelspace),
-			dot(STR2 * distance.zzz, surfaceNormalModelspace),
-			dot(STR3 * distance.www, surfaceNormalModelspace)), 0.0);
-		#endif
-
-		myhalf4 C0 = myhalf4(LinearColor(u_DlightDiffuseAndInvRadius[dlight].xyz), LinearColor(u_DlightDiffuseAndInvRadius[dlight].w));
-		myhalf4 C1 = myhalf4(LinearColor(u_DlightDiffuseAndInvRadius[dlight + 1].xyz), LinearColor(u_DlightDiffuseAndInvRadius[dlight + 1].w));
-		myhalf4 C2 = myhalf4(LinearColor(u_DlightDiffuseAndInvRadius[dlight + 2].xyz), LinearColor(u_DlightDiffuseAndInvRadius[dlight + 2].w));
-		Color += myhalf3(dot(C0, falloff), dot(C1, falloff), dot(C2, falloff));
+	myhalf scale = myhalf(dot(dir, surfaceNormalModelspace));
+	if( scale <= 0.0f ) {
+		discard;
 	}
 
-	Color *= u_LightingIntensity;
-	return Color;
-#ifdef dlight
-#undef dlight
+#if !defined(APPLY_DLIGHT_DIRECTIONAL)
+	myhalf dist = myhalf(length(dir));
+	myhalf falloff = myhalf(1.0) - dist * u_DlightDiffuseAndInvRadius.w;
+
+	falloff = clamp(falloff, 0.0, 1.0);
+	falloff *= falloff;
+
+	scale *= myhalf(1.0) / dist; // norm the dot product with surface normal
+	scale *= falloff;
 #endif
+
+#ifdef APPLY_REALTIME_SHADOWS
+	myhalf shadow;
+	vec3 shadowmaptc;
+
+#ifdef APPLY_DLIGHT_DIRECTIONAL
+	if (u_ShadowmapNumCascades > 1) {
+		shadow = ShadowmapOrthoFilterCSM(u_ShadowmapTexture, u_ShadowmapNumCascades, u_ShadowmapCascadeMatrix, Position, Color, u_ShadowmapTextureScale, u_ShadowmapParams);
+	} else {
+		shadow = ShadowmapOrthoFilter(u_ShadowmapTexture, u_ShadowmapCascadeMatrix[0], Position, u_ShadowmapTextureScale, u_ShadowmapParams);
+	}
+#else
+	cubeVec = vec3(u_DlightMatrix * Position);
+	shadowmaptc = GetShadowMapTC2D(cubeVec, u_ShadowmapParams);
+	shadow = ShadowmapFilter(u_ShadowmapTexture, shadowmaptc + vec3(u_ShadowmapTextureScale.zw, 0.0f), u_ShadowmapTextureScale.xy);
+#endif
+
+	scale *= shadow;
+#else
+
+#ifdef APPLY_DLIGHT_CUBEFILTER
+	cubeVec = vec3(u_DlightMatrix * Position);
+#endif
+
+#endif
+
+	Color *= scale;
+
+#ifdef APPLY_DLIGHT_CUBEFILTER
+	Color *= myhalf3(qf_textureCube(u_CubeFilter, cubeVec));
+#endif
+
+	return Color;
 }

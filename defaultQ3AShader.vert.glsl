@@ -60,10 +60,10 @@ void main(void)
 #endif // !defined(APPLY_CUBEMAP) && !defined(APPLY_SURROUNDMAP)
 
 #if defined(NUM_DLIGHTS) || defined(APPLY_CUBEMAP) || defined(APPLY_SURROUNDMAP)
-	v_Position = Position.xyz;
+	v_Position = Position;
 #endif
 
-#if defined(APPLY_CUBEMAP) || defined(APPLY_DRAWFLAT)
+#if defined(APPLY_CUBEMAP) || defined(APPLY_DRAWFLAT) || defined(NUM_DLIGHTS)
 	v_Normal = Normal;
 #endif
 
@@ -82,5 +82,5 @@ void main(void)
 #if defined(APPLY_SOFT_PARTICLE)
 	vec4 modelPos = u_ModelViewMatrix * Position;
 	v_Depth = -modelPos.z;
-#endif	
+#endif
 }

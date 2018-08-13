@@ -7,10 +7,10 @@
 #endif
 
 #if defined(NUM_DLIGHTS) || defined(APPLY_CUBEMAP) || defined(APPLY_SURROUNDMAP)
-qf_varying vec3 v_Position;
+qf_varying vec4 v_Position;
 #endif
 
-#if defined(APPLY_CUBEMAP) || defined(APPLY_DRAWFLAT)
+#if defined(APPLY_CUBEMAP) || defined(APPLY_DRAWFLAT) || defined(NUM_DLIGHTS)
 qf_varying myhalf3 v_Normal;
 #endif
 

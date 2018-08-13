@@ -36,43 +36,62 @@ uniform LightmapSampler u_LightmapTexture3;
 uniform sampler2D u_DepthTexture;
 #endif
 
-void main(void)
+myhalf3 LightmapColor()
 {
-	myhalf4 color;
+	myhalf3 color = myhalf3(0.0);
 
-#ifdef NUM_LIGHTMAPS
-	color = myhalf4(0.0, 0.0, 0.0, qf_FrontColor.a);
-	color.rgb += myhalf3(Lightmap(u_LightmapTexture0, v_LightmapTexCoord01.st, v_LightmapLayer0123.x)) * LinearColor(u_LightstyleColor[0]);
+#if defined(NUM_LIGHTMAPS)
+	color += myhalf3(Lightmap(u_LightmapTexture0, v_LightmapTexCoord01.st, v_LightmapLayer0123.x)) * LinearColor(u_LightstyleColor[0]);
 #if NUM_LIGHTMAPS >= 2
-	color.rgb += myhalf3(Lightmap(u_LightmapTexture1, v_LightmapTexCoord01.pq, v_LightmapLayer0123.y)) * LinearColor(u_LightstyleColor[1]);
+	color += myhalf3(Lightmap(u_LightmapTexture1, v_LightmapTexCoord01.pq, v_LightmapLayer0123.y)) * LinearColor(u_LightstyleColor[1]);
 #if NUM_LIGHTMAPS >= 3
-	color.rgb += myhalf3(Lightmap(u_LightmapTexture2, v_LightmapTexCoord23.st, v_LightmapLayer0123.z)) * LinearColor(u_LightstyleColor[2]);
+	color += myhalf3(Lightmap(u_LightmapTexture2, v_LightmapTexCoord23.st, v_LightmapLayer0123.z)) * LinearColor(u_LightstyleColor[2]);
 #if NUM_LIGHTMAPS >= 4
-	color.rgb += myhalf3(Lightmap(u_LightmapTexture3, v_LightmapTexCoord23.pq, v_LightmapLayer0123.w)) * LinearColor(u_LightstyleColor[3]);
+	color += myhalf3(Lightmap(u_LightmapTexture3, v_LightmapTexCoord23.pq, v_LightmapLayer0123.w)) * LinearColor(u_LightstyleColor[3]);
 #endif // NUM_LIGHTMAPS >= 4
 #endif // NUM_LIGHTMAPS >= 3
 #endif // NUM_LIGHTMAPS >= 2
-	color.rgb *= u_LightingIntensity;
-#else
-	color = myhalf4(qf_FrontColor);
 #endif // NUM_LIGHTMAPS
+
+	return color;
+}
+
+void main(void)
+{
+	myhalf4 color;
+	myhalf3 lightColor = myhalf3(qf_FrontColor.rgb);
+
+#if defined(APPLY_LIGHTING)
+#ifdef APPLY_VERTEX_LIGHTING
+	lightColor *= LinearColor(u_LightstyleColor[0]); // qf_FrontColor is already linear
+#elif defined(NUM_LIGHTMAPS)
+	// so that team-colored shaders work
+	lightColor *= LightmapColor();
+#else
+	lightColor = myhalf3(0.0);
+#endif
+
+#if defined(NUM_DLIGHTS)
+	lightColor += DynamicLightsColor(v_Position, myhalf3(normalize(v_Normal)));
+#endif // NUM_DLIGHTS
+
+	lightColor *= u_LightingIntensity;
+#endif 
+
+	color = myhalf4(lightColor, qf_FrontColor.a);
 
 #if defined(APPLY_FOG) && !defined(APPLY_FOG_COLOR)
 	myhalf fogDensity = FogDensity(v_FogCoord);
 #endif
 
-#if defined(NUM_DLIGHTS)
-	color.rgb += DynamicLightsColor(v_Position);
-#endif
-
 	myhalf4 diffuse;
 
 #if defined(APPLY_CUBEMAP)
-	diffuse = myhalf4(qf_textureCube(u_BaseTexture, reflect(v_Position - u_EntityDist, normalize(v_Normal))));
+	diffuse = myhalf4(qf_textureCube(u_BaseTexture, reflect(v_Position.xyz - u_EntityDist, normalize(v_Normal))));
 #elif defined(APPLY_CUBEMAP_VERTEX)
 	diffuse = myhalf4(qf_textureCube(u_BaseTexture, v_TexCoord));
 #elif defined(APPLY_SURROUNDMAP)
-	diffuse = myhalf4(qf_textureCube(u_BaseTexture, v_Position - u_EntityDist));
+	diffuse = myhalf4(qf_textureCube(u_BaseTexture, v_Position.xyz - u_EntityDist));
 #else
 	diffuse = myhalf4(qf_texture(u_BaseTexture, v_TexCoord));
 #endif
@@ -90,7 +109,7 @@ void main(void)
 
 #ifdef NUM_LIGHTMAPS
 	// so that team-colored shaders work
-	color *= myhalf4(qf_FrontColor);
+	color.rgb *= myhalf3(qf_FrontColor.rgb);
 #endif
 
 #ifdef APPLY_GREYSCALE
