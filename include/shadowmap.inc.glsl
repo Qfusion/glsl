@@ -138,7 +138,7 @@ myhalf ShadowmapOrthoFilter(in SHADOW_SAMPLER shadowmapTex, in mat4 shadowMatrix
 	return f;
 }
 
-myhalf ShadowmapOrthoFilterCSM(in SHADOW_SAMPLER shadowmapTex, int numCascades, in mat4 cascadeMatrix[MAX_SHADOW_CASCADES], in vec4 pos, in out myhalf3 Color, in vec4 texscale, in vec4 params) 
+myhalf ShadowmapOrthoFilterCSM(in SHADOW_SAMPLER shadowmapTex, int numCascades, in mat4 cascadeMatrix[MAX_SHADOW_CASCADES], in vec4 pos, inout myhalf3 Color, in vec4 texscale, in vec4 params) 
 {
 	myhalf f;
 	myhalf3 cascadeColors[MAX_SHADOW_CASCADES] = myhalf3[](
@@ -151,8 +151,7 @@ myhalf ShadowmapOrthoFilterCSM(in SHADOW_SAMPLER shadowmapTex, int numCascades, 
 	vec2 pad = params.xy;
 	vec3 shadowmaptc = vec3(-1.0);
 
-	numCascades = min(numCascades, MAX_SHADOW_CASCADES);
-	for (int i = 0; i < numCascades && cascadeIndex < 0; i++) {
+	for (int i = 0; i < numCascades && i < MAX_SHADOW_CASCADES && cascadeIndex < 0; i++) {
 		shadowmaptc = vec3(cascadeMatrix[i] * pos);
 		if (shadowmaptc.z > 0.0 && shadowmaptc.z < 1.0) {
 			if (min(shadowmaptc.x, shadowmaptc.y) > pad.x && max(shadowmaptc.x, shadowmaptc.y) < pad.y) {
